@@ -7,7 +7,7 @@ This project demonstrates the use of Neon in AOS and performance improvement obt
 Neon provides scalar/vector instruction and registered (shared with the FPU) comparable to MMX/SSE/SdNow! in the x86World
 
 ### Purpose of Neon
-* Thirty-two 128-bit vector registers, each capable of containing multiple lanes of data.
+* 4 Thirty-two 128-bit vector registers, each capable of containing multiple lanes of data.
 * SIMD instructions to operate simultaneously on those multiple lanes of data.
 
 ### Neon Intrinsics
@@ -21,7 +21,7 @@ The Neon intrinsics are a set of C and C++ functions defined in arm_neon.h which
 ## Instructions
 - Instructions implementable can be found [here](https://developer.arm.com/architectures/instruction-sets/intrinsics)
 
-## Set up
+## Syntax
 Enable ARM-NEON on application's gradle script's defaultConfig section
 ```gradle
   defaultConfig {
@@ -55,7 +55,7 @@ include `arm_neon.h` in the targeted cpp files
 ...
 ```
 
-implement matrix / multi-array / vector operation through neon 
+implement operations with neon instructions
 ```C++
 
 float dotProductNeon(float* vector1, float* vector2, short len) {
@@ -88,10 +88,10 @@ float dotProductNeon(float* vector1, float* vector2, short len) {
 ```
 
 ## Performance Table
-Operation | Test Device | Num Trials | Native(Kotlin) | C++ | Neon |
+Operation | Test Device | Num Trials | Native(Kotlin) (ms) | C++ (ms) | Neon (ms) |
 --- | --- |--- | --- | --- |--- |
-Dot Product | LG-G7 | 10000 | 0.0758ms | 0.0066ms | 0.0048ms |
-Cosine Similarity| LG-G7 | 10000 | 0.0303ms | 0.0506ms | 0.01ms |
+Dot Product | LG-G7 | 10000 | 0.0758 | 0.0066 | 0.0048 |
+Cosine Similarity| LG-G7 | 10000 | 0.0303 | 0.0506 | 0.01 |
 
 
 _some of the functions used in this project can be found [here](https://developer.arm.com/documentation/102467/0100/Matrix-multiplication-example?lang=en)_
