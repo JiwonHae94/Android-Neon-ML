@@ -85,9 +85,10 @@ float dotProductNeon(float* vector1, float* vector2, short len) {
 ```
 
 ## Performance Table
-Operation | Num Trials | Native(Kotlin) | C++ | Neon |
---- | --- | --- | --- |--- |
-Dot Product | 1000 | 0.119ms | 0.076ms | 0.069ms |
+Operation | Test Device | Num Trials | Native(Kotlin) | C++ | Neon |
+--- | --- |--- | --- | --- |--- |
+Dot Product | LG-G7 | 10000 | 0.0758ms | 0.0066ms | 0.0048ms |
+Cosine Similarity| LG-G7 | 10000 | 0.0303ms | 0.0506ms | 0.01ms |
 
 _some of the functions used in this project can be found [here](https://developer.arm.com/documentation/102467/0100/Matrix-multiplication-example?lang=en)_
 
