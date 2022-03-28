@@ -4,7 +4,7 @@ project(neon_simd)
 # This ensures that a certain set of CMake features is available to
 # your build.
 cmake_minimum_required(VERSION 3.10)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(cpufeatures STATIC
         ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
 
@@ -51,4 +51,17 @@ target_link_libraries(
         ${android-lib}
         ${log-lib}
         ${ANDROID_NDK}/sources/android/cpufeatures
+)
+
+add_library(
+        jni_array_op
+        SHARED
+        jni_array_ops.cpp
+        ${neon_SRCS}
+)
+
+target_link_libraries(
+        jni_array_op
+        ${android-lib}
+        ${log-lib}
 )
