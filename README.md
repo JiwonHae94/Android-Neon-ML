@@ -18,6 +18,9 @@ The Neon intrinsics are a set of C and C++ functions defined in arm_neon.h which
 - Some of ARMv7
 - All ARMv8
 
+## Instructions
+- Instructions implementable can be found [here](https://developer.arm.com/architectures/instruction-sets/intrinsics)
+
 ## Set up
 Enable ARM-NEON on application's gradle script's defaultConfig section
 ```gradle
@@ -89,6 +92,7 @@ Operation | Test Device | Num Trials | Native(Kotlin) | C++ | Neon |
 --- | --- |--- | --- | --- |--- |
 Dot Product | LG-G7 | 10000 | 0.0758ms | 0.0066ms | 0.0048ms |
 Cosine Similarity| LG-G7 | 10000 | 0.0303ms | 0.0506ms | 0.01ms |
+
 
 _some of the functions used in this project can be found [here](https://developer.arm.com/documentation/102467/0100/Matrix-multiplication-example?lang=en)_
 
