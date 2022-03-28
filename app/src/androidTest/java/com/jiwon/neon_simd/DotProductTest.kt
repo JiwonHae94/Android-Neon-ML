@@ -1,22 +1,13 @@
 package com.jiwon.neon_simd
 
+import com.jiwon.neon_simd.helper.TestHelper
+import com.jiwon.neon_simd.helper.TestHelper.generateRandomFloatArray
 import org.junit.Test
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class OperationsTest{
+class DotProductTest{
     private val NumTrial = 1000
-    private fun generateRandomDoubleInput(len : Int) : Pair<DoubleArray, DoubleArray>{
-        val arr1 = Array(len){ Random.nextDouble() }
-        val arr2 = Array(len){ Random.nextDouble() }
-        return Pair(arr1.toDoubleArray(), arr2.toDoubleArray())
-    }
-
-    private fun generateRandomFloatInput(len : Int) : Pair<FloatArray, FloatArray>{
-        val arr1 = Array(len){ Random.nextFloat() }
-        val arr2 = Array(len){ Random.nextFloat() }
-        return Pair(arr1.toFloatArray(), arr2.toFloatArray())
-    }
 
     @Test
     fun testNativDotProduct(){
@@ -26,7 +17,7 @@ class OperationsTest{
 
         // neon improves performance by .58
         for(no in 0 until NumTrial){
-            val (arr1, arr2) = generateRandomFloatInput(512)
+            val (arr1, arr2) = generateRandomFloatArray(512)
             val startTimeNative = System.currentTimeMillis()
             val rsltNative = arr1.zip(arr2).sumOf { pair ->
                 (pair.first * pair.second).toDouble()
@@ -52,8 +43,9 @@ class OperationsTest{
             println("native : ${rsltNative}")
             println("cpp : ${rsltCPP}")
             println("neon : ${rsltNeon}")
-
-            assert((rsltNative.roundToInt() == rsltCPP.roundToInt()) && (rsltCPP.roundToInt() == rsltNeon.roundToInt()))
+            
+            val result = TestHelper.compareResults(rsltNative, rsltCPP, rsltNeon)
+            assert(result)
         }
 
         println("time taken native : ${nativeTimeTaken / NumTrial}")
