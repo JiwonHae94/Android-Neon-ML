@@ -55,37 +55,39 @@ include `arm_neon.h` in the targeted cpp files
 implement matrix / multi-array / vector operation through neon 
 ```C++
 
-int dotProductNeon(short* vector1, short* vector2, short len) {
+float dotProductNeon(float* vector1, float* vector2, short len) {
     const short transferSize = 4;
     short segments = len / transferSize;
 
     // 4-element vector of zeros
-    int32x4_t partialSumsNeon = vdupq_n_s32(0);
+    float32x4_t partialSums = vdupq_n_f32(0);
 
     // Main loop (note that loop index goes through segments)
-    for(short i = 0; i < segments; i++) {
-        // Load vector elements to registers
+    for(int i = 0 ; i < segments; i++){
         short offset = i * transferSize;
-        int16x4_t vector1Neon = vld1_s16(vector1 + offset);
-        int16x4_t vector2Neon = vld1_s16(vector2 + offset);
-
-        // Multiply and accumulate: partialSumsNeon += vector1Neon * vector2Neon
-        partialSumsNeon = vmlal_s16(partialSumsNeon, vector1Neon, vector2Neon);
+        float32x4_t a1 = vld1q_f32(vector1.data() + offset);
+        float32x4_t a2 = vld1q_f32(vector1.data() + offset);
+        partialSums = vmlaq_f32(partialSums, a1, a2);
     }
-
-    // Store partial sums
-    int partialSums[transferSize];
-    vst1q_s32(partialSums, partialSumsNeon);
+  
+    // store partial values
+    float partialSum[arr1Size];
+    vst1q_f32(partialSum, partialSums);
 
     // Sum up partial sums
-    int result = 0;
-    for(short i = 0; i < transferSize; i++) {
-        result += partialSums[i];
+    float result = 0;
+    for(int i = 0; i < transferSize; i++){
+        result += partialSum[i];
     }
 
     return result;
 }
 ```
+
+## Performance Table
+Operation | Num Trials | Native(Kotlin) | C++ | Neon |
+--- | --- | --- | --- |--- |
+Dot Product | 1000 | 0.119ms | 0.076ms | 0.069ms |
 
 _some of the functions used in this project can be found [here](https://developer.arm.com/documentation/102467/0100/Matrix-multiplication-example?lang=en)_
 
