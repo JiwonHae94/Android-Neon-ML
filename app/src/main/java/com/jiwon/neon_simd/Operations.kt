@@ -3,7 +3,6 @@ package com.jiwon.neon_simd
 import android.util.Log
 
 object Operations {
-
     // formulae : x dot y / ||x|| * ||y||
     fun cosineSimilarity(arr1 : FloatArray, arr2 : FloatArray): Double{
         var sumProduct = 0f
@@ -15,14 +14,17 @@ object Operations {
             sumOfsqA += Math.pow(arr1.get(i).toDouble(), 2.0)
             sumOfsqB += Math.pow(arr2.get(i).toDouble(), 2.0)
         }
-        return sumProduct / (Math.sqrt(sumOfsqA * Math.sqrt(sumOfsqB)))
+        return sumProduct / (Math.sqrt(sumOfsqA) * Math.sqrt(sumOfsqB))
     }
 
-    inline fun dot(arr1 : Array<Double>, arr2 : Array<Double>) : Double {
-        return arr1.zip(arr2).sumOf{ pair ->
-            pair.first * pair.second
-        }
+    fun dotMatrix(arr1 : FloatArray, arr2 : FloatArray) = arr1.zip(arr2).sumOf { pair ->
+        (pair.first * pair.second).toDouble()
     }
+
+
+    external fun cosineSimilarityCPP(arr1 : FloatArray, arr2 : FloatArray) : Float
+
+    external fun cosineSimilarityNeon(arr1 : FloatArray, arr2 : FloatArray) : Float
 
     external fun dotNeon(arr1 : FloatArray, arr2 : FloatArray) : Float
 

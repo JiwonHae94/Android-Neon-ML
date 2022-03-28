@@ -29,8 +29,6 @@ object TestHelper {
             (it - diff)..(it + diff)
         }
 
-        println(ranges.joinToString(" "))
-
         for(i in `val`){
             for(r in ranges){
                 if (i in r){
