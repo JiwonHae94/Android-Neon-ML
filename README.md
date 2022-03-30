@@ -18,10 +18,10 @@ The Neon intrinsics are a set of C and C++ functions defined in arm_neon.h which
 - Some of ARMv7
 - All ARMv8
 
-## Instructions
+### Instructions
 - Instructions implementable can be found [here](https://developer.arm.com/architectures/instruction-sets/intrinsics)
 
-## Syntax
+### Syntax
 Enable ARM-NEON on application's gradle script's defaultConfig section
 ```gradle
   defaultConfig {
