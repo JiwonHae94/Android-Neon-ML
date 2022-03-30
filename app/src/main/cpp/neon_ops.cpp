@@ -173,6 +173,8 @@ Java_com_jiwon_neon_1simd_Operations_cosineSimilarityNeon(JNIEnv *env, jobject t
     return result / (sqrt(sumSqA) * sqrt(sumSqB));
 
 }
+
+
 extern "C"
 JNIEXPORT jfloatArray JNICALL
 Java_com_jiwon_neon_1simd_Operations_softmaxJNI(JNIEnv *env, jobject thiz, jfloatArray arr1) {
@@ -200,6 +202,7 @@ Java_com_jiwon_neon_1simd_Operations_softmaxJNI(JNIEnv *env, jobject thiz, jfloa
 extern "C"
 JNIEXPORT jfloatArray JNICALL
 Java_com_jiwon_neon_1simd_Operations_softmaxNeon(JNIEnv *env, jobject thiz, jfloatArray arr1) {
+    // retrieve length and elements from arr
     int len = env->GetArrayLength(arr1);
     float* jniArr = env->GetFloatArrayElements(arr1, 0);
 
@@ -217,19 +220,59 @@ Java_com_jiwon_neon_1simd_Operations_softmaxNeon(JNIEnv *env, jobject thiz, jflo
     }
 
     float maxArray[4];
-    vst1q_f32(max, maxArray);
+    vst1q_f32(maxArray, partialMax);
 
     // max obtained
     float maxValue = *max_element(maxArray, maxArray + transferSize);
 
+    // create neon with _max obtained
+    float32x4_t max = vmovq_n_f32(maxValue);
+
     float exp_x[len];
+    float32x4_t partialSums = vdupq_n_f32(0);
+
     for(int i = 0; i < numSegments; i++){
         short offset = i * transferSize;
 
         // obtain sublist
         float32x4_t a1 = vld1q_f32(jniArr + offset);
 
+        // exp
+        a1 = exp_ps(vsubq_f32(a1, max));
+
+        vst1q_f32(exp_x + offset, a1);
+
+        // accumulate partial sums
+        partialSums = vaddq_f32(partialSums, a1);
     }
 
-    return arr1;
+    // release jni arr as it's no longer in use
+    env->ReleaseFloatArrayElements(arr1, jniArr, 0);
+
+    // retrieve sum of the input arr
+    float partialSum[transferSize];
+    vst1q_f32(partialSum, partialSums);
+
+    float sum = 0;
+    for(int i = 0; i < 4; i++){
+        sum += partialSum[i];
+    }
+
+    // convert mul -> div
+    sum = 1 / sum;
+
+    for(int i = 0; i < numSegments; i++){
+        short offset = i * transferSize;
+
+        // get sublist
+        float32x4_t a1 = vld1q_f32(exp_x + offset);
+
+        // div sublist by sum : a1 /= sum
+        vst1q_f32(exp_x + offset, vmulq_n_f32(a1, sum));
+    }
+
+    // convert to native array
+    jfloatArray outArray =env->NewFloatArray(len);
+    env->SetFloatArrayRegion(outArray, 0, len, exp_x);
+    return outArray;;
 }

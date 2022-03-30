@@ -21,7 +21,7 @@ object Operations {
 
     // softmax 1d
     fun softmax(arr1 : FloatArray) : FloatArray{
-        val _max = arr1.maxOrNull() ?: -1f
+        val _max = arr1.maxOrNull() ?: return floatArrayOf()
         val exp_x = arr1.map { exp(it - _max) }
         val _sum = exp_x.sum()
         return exp_x.map { it / _sum }.toFloatArray()

@@ -85,7 +85,7 @@ class NeonTest{
         val opTag = "softmax"
 
         // neon improves performance by .58
-        for(no in 0 until 1){
+        for(no in 0 until NumTrial){
             val (arr1, arr2) = generateRandomFloatArray(512)
 
             val startTimeNative = System.currentTimeMillis()
@@ -99,16 +99,11 @@ class NeonTest{
             cppTimeTaken += endTimeCPP - startTimeCPP
 
             val startTimeNeon = System.currentTimeMillis()
-            val rsltNeon = Operations.cosineSimilarityNeon(arr1.clone(), arr2.clone())
+            val rsltNeon = Operations.softmaxNeon(arr1)
             val endTimeNeon = System.currentTimeMillis()
             neonTimeTaken += endTimeNeon - startTimeNeon
 
-
-            println("softmax native " + rsltNative.sorted().joinToString(" "))
-            println("softmax cpp " + rsltCPP.sorted().joinToString(" "))
-            //println("softmax neon " + rsltNeon.sorted().joinToString(" "))
-
-            val result = TestHelper.compareResults(rsltNative.maxOrNull()!!, rsltCPP.maxOrNull()!!)
+            val result = TestHelper.compareResults(rsltNative.maxOrNull()!!, rsltCPP.maxOrNull()!!, rsltNeon.maxOrNull()!!)
             assert(result)
         }
 
