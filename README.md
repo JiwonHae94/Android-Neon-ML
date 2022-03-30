@@ -92,7 +92,7 @@ Operation | Test Device | Input Type | Input Dims | Num Trials | Native(Kotlin) 
 --- | --- |--- | --- | --- |--- | --- |--- |
 Dot Product | LG-G7 | FloatArray | 1 x 512 |10000 | 0.0758 | 0.0066 | 0.0048 |
 Cosine Similarity | LG-G7 | FloatArray| 1 x 512 |10000 | 0.0303 | 0.0506 | 0.01 |
-Softmax 1D | LG-G7 | 10000 | FloatArray |1 x 512 | 0.0998 | 0.0257 | 0.0597 |
+Softmax 1D | LG-G7 | FloatArray |1 x 512 |10000 |  0.0998 | 0.0257 | 0.0597 |
 
 
 _some of the functions used in this project can be found [here](https://developer.arm.com/documentation/102467/0100/Matrix-multiplication-example?lang=en)_
