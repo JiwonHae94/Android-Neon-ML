@@ -4,8 +4,8 @@
 //
 #include <jni.h>
 #include <vector>
-#include
 #include <arm_neon.h>
+#include <neon_math.hpp>
 #include <jni_array.hpp>
 #include "string"
 #include "chrono"
