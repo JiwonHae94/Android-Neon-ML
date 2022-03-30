@@ -4,6 +4,7 @@
 //
 #include <jni.h>
 #include <vector>
+#include
 #include <arm_neon.h>
 #include <jni_array.hpp>
 #include "string"
@@ -20,6 +21,15 @@
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN , LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR , LOG_TAG, __VA_ARGS__)
 
+#if defined(HAVE_NEON) && defined(HAVE_NEON_X86)
+/*
+  * The latest version and instruction for NEON_2_SSE.h is at:
+  *    https://github.com/intel/ARM_NEON_2_x86_SSE
+  */
+  #include "NEON_2_SSE.h"
+#elif defined(HAVE_NEON)
+    #include <arm_neon.h>
+#endif
 
 using namespace std;
 
@@ -114,6 +124,7 @@ Java_com_jiwon_neon_1simd_Operations_cosineSimilarityCPP(JNIEnv *env, jobject th
 
     return sumProduct / (sqrt(sumSqA) * sqrt(sumSqB));
 }
+
 extern "C"
 JNIEXPORT jfloat JNICALL
 Java_com_jiwon_neon_1simd_Operations_cosineSimilarityNeon(JNIEnv *env, jobject thiz,
@@ -161,4 +172,64 @@ Java_com_jiwon_neon_1simd_Operations_cosineSimilarityNeon(JNIEnv *env, jobject t
 
     return result / (sqrt(sumSqA) * sqrt(sumSqB));
 
+}
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_com_jiwon_neon_1simd_Operations_softmaxJNI(JNIEnv *env, jobject thiz, jfloatArray arr1) {
+    int len = env->GetArrayLength(arr1);
+    float* jniArr = env->GetFloatArrayElements(arr1, 0);
+
+    float _max = *std::max_element(jniArr, jniArr + len);
+    float exp_x[len];
+    float sum = 0;
+
+    for(int i = 0 ; i < len; i++){
+        exp_x[i] = exp(jniArr[i] - _max);
+        sum += exp_x[i];
+    }
+
+    for(int i = 0; i < len; i++){
+        exp_x[i] /= sum;
+    }
+
+    env->ReleaseFloatArrayElements(arr1, jniArr, 0);
+    jfloatArray outArray =env->NewFloatArray(len);
+    env->SetFloatArrayRegion(outArray, 0, len, exp_x);
+    return outArray;
+}
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_com_jiwon_neon_1simd_Operations_softmaxNeon(JNIEnv *env, jobject thiz, jfloatArray arr1) {
+    int len = env->GetArrayLength(arr1);
+    float* jniArr = env->GetFloatArrayElements(arr1, 0);
+
+    short transferSize = 4;
+    short numSegments = len / 4;
+
+    // partial max to get max value
+    float32x4_t partialMax = vdupq_n_f32(0);
+    for(int i = 0; i < numSegments; i++){
+        short offset = i * transferSize;
+
+        // get max of vectors
+        float32x4_t a1 = vld1q_f32(jniArr + offset);
+        partialMax = vmaxq_f32(partialMax, a1);
+    }
+
+    float maxArray[4];
+    vst1q_f32(max, maxArray);
+
+    // max obtained
+    float maxValue = *max_element(maxArray, maxArray + transferSize);
+
+    float exp_x[len];
+    for(int i = 0; i < numSegments; i++){
+        short offset = i * transferSize;
+
+        // obtain sublist
+        float32x4_t a1 = vld1q_f32(jniArr + offset);
+
+    }
+
+    return arr1;
 }

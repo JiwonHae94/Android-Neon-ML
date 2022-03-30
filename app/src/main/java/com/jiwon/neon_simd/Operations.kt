@@ -1,6 +1,8 @@
 package com.jiwon.neon_simd
 
 import android.util.Log
+import java.util.*
+import kotlin.math.exp
 
 object Operations {
     // formulae : x dot y / ||x|| * ||y||
@@ -17,10 +19,17 @@ object Operations {
         return sumProduct / (Math.sqrt(sumOfsqA) * Math.sqrt(sumOfsqB))
     }
 
+    // softmax 1d
+    fun softmax(arr1 : FloatArray) : FloatArray{
+        val _max = arr1.maxOrNull() ?: -1f
+        val exp_x = arr1.map { exp(it - _max) }
+        val _sum = exp_x.sum()
+        return exp_x.map { it / _sum }.toFloatArray()
+    }
+
     fun dotMatrix(arr1 : FloatArray, arr2 : FloatArray) = arr1.zip(arr2).sumOf { pair ->
         (pair.first * pair.second).toDouble()
     }
-
 
     external fun cosineSimilarityCPP(arr1 : FloatArray, arr2 : FloatArray) : Float
 
@@ -30,7 +39,11 @@ object Operations {
 
     external fun dotJNI(arr1 : FloatArray, arr2 : FloatArray) : Float
 
+    external fun softmaxJNI(arr1 : FloatArray) : FloatArray
+
+    external fun softmaxNeon(arr1 : FloatArray) : FloatArray
+
     init{
-        System.loadLibrary("jni_array_op")
+        System.loadLibrary("neon_op")
     }
 }

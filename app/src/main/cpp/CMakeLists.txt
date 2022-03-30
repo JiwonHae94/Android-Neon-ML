@@ -5,18 +5,16 @@ project(neon_simd)
 # your build.
 cmake_minimum_required(VERSION 3.10)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_library(cpufeatures STATIC
-        ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
 
 if (${ANDROID_ABI} STREQUAL "armeabi-v7a")
     # make a list of neon files and add neon compiling flags to them
-    set(neon_SRCS native-lib.cpp)
+    set(neon_SRCS neon_ops.cpp)
 
     set_property(SOURCE ${neon_SRCS}
             APPEND_STRING PROPERTY COMPILE_FLAGS " -mfpu=neon")
     add_definitions("-DHAVE_NEON=1")
 elseif (${ANDROID_ABI} STREQUAL "x86")
-    set(neon_SRCS native-lib.cpp)
+    set(neon_SRCS neon_ops.cpp)
     set_property(SOURCE ${neon_SRCS} APPEND_STRING PROPERTY COMPILE_FLAGS
             " -mssse3  -Wno-unknown-attributes \
                    -Wno-deprecated-declarations \
@@ -40,28 +38,14 @@ find_library(
 )
 
 add_library(
-        native-lib
+        neon_op
         SHARED
-        native-lib.cpp
+        neon_ops.cpp
         ${neon_SRCS}
 )
 
 target_link_libraries(
-        native-lib
-        ${android-lib}
-        ${log-lib}
-        ${ANDROID_NDK}/sources/android/cpufeatures
-)
-
-add_library(
-        jni_array_op
-        SHARED
-        jni_array_ops.cpp
-        ${neon_SRCS}
-)
-
-target_link_libraries(
-        jni_array_op
+        neon_op
         ${android-lib}
         ${log-lib}
 )
