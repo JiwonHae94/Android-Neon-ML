@@ -1,8 +1,10 @@
 package com.jiwon.neon_simd
 
 import android.util.Log
+import com.jiwon.neon_simd.helper.TestHelper
 import java.util.*
 import kotlin.math.exp
+import kotlin.random.Random
 
 object Operations {
     // formulae : x dot y / ||x|| * ||y||
