@@ -18,10 +18,10 @@ The Neon intrinsics are a set of C and C++ functions defined in arm_neon.h which
 - Some of ARMv7
 - All ARMv8
 
-## Instructions
+### Instructions
 - Instructions implementable can be found [here](https://developer.arm.com/architectures/instruction-sets/intrinsics)
 
-## Syntax
+### Syntax
 Enable ARM-NEON on application's gradle script's defaultConfig section
 ```gradle
   defaultConfig {
@@ -88,11 +88,11 @@ float dotProductNeon(float* vector1, float* vector2, short len) {
 ```
 
 ## Performance Table
-Operation | Test Device | Num Trials | Native(Kotlin) (ms) | C++ (ms) | Neon (ms) |
---- | --- |--- | --- | --- |--- |
-Dot Product | LG-G7 | 10000 | 0.0758 | 0.0066 | 0.0048 |
-Cosine Similarity | LG-G7 | 10000 | 0.0303 | 0.0506 | 0.01 |
-Softmax 1D | LG-G7 | 10000 | 0.0998 | 0.0257 | 0.0597 |
+Operation | Test Device | Input Type | Input Dims | Num Trials | Native(Kotlin) (ms) | C++ (ms) | Neon (ms) |
+--- | --- |--- | --- | --- |--- | --- |--- |
+Dot Product | LG-G7 | FloatArray | 1 x 512 |10000 | 0.0758 | 0.0066 | 0.0048 |
+Cosine Similarity | LG-G7 | FloatArray| 1 x 512 |10000 | 0.0303 | 0.0506 | 0.01 |
+Softmax 1D | LG-G7 | FloatArray |1 x 512 |10000 |  0.0998 | 0.0257 | 0.0597 |
 
 
 _some of the functions used in this project can be found [here](https://developer.arm.com/documentation/102467/0100/Matrix-multiplication-example?lang=en)_
