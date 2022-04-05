@@ -3,6 +3,7 @@ package com.jiwon.neon_simd
 import com.jiwon.neon_simd.helper.TestHelper
 import com.jiwon.neon_simd.helper.TestHelper.generateRandomFloatArray
 import org.junit.Test
+import kotlin.random.Random
 
 class NeonTest{
     // our gallery size
@@ -86,7 +87,7 @@ class NeonTest{
 
         // neon improves performance by .58
         for(no in 0 until NumTrial){
-            val (arr1, arr2) = generateRandomFloatArray(512)
+            val (arr1, arr2) = generateRandomFloatArray(512 * 2)
 
             val startTimeNative = System.currentTimeMillis()
             val rsltNative = Operations.softmax(arr1)
@@ -116,5 +117,83 @@ class NeonTest{
     fun testSoftmaxNeon(){
         val (arr1, arr2) = generateRandomFloatArray(512)
         Operations.softmaxNeon(arr1)
+    }
+
+    @Test
+    fun testSum(){
+        var nativeTimeTaken = 0.0
+        var cppTimeTaken = 0.0
+        var neonTimeTaken = 0.0
+        val opTag = "sum"
+        val numTrial = 100
+
+        // neon improves performance by .58
+        for(no in 0 until numTrial){
+            val arrSize = Random.nextInt(300, 5000)
+            val arr1 = FloatArray(arrSize){ Random.nextFloat() }
+
+            val startTimeNative = System.currentTimeMillis()
+            val rsltNative = Operations.sum(arr1.clone())
+            val endTimeNative = System.currentTimeMillis()
+            nativeTimeTaken += endTimeNative - startTimeNative
+
+            val startTimeCPP = System.currentTimeMillis()
+            val rsltCPP = Operations.sumJNI(arr1.clone())
+            val endTimeCPP = System.currentTimeMillis()
+            cppTimeTaken += endTimeCPP - startTimeCPP
+
+            val startTimeNeon = System.currentTimeMillis()
+            val rsltNeon = Operations.sumNeon(arr1.clone())
+            val endTimeNeon = System.currentTimeMillis()
+            neonTimeTaken += endTimeNeon - startTimeNeon
+
+            println("-------------------------------------")
+            println("Neon time : $neonTimeTaken ms")
+            println("C++ time : $cppTimeTaken ms")
+            println("Native time : $nativeTimeTaken ms")
+            println("rsult Neon : $rsltNeon $rsltCPP $rsltNative")
+
+            val result = TestHelper.compareResults(rsltNative, rsltCPP, rsltNeon)
+            assert(result)
+        }
+    }
+
+    @Test
+    fun testAverage(){
+        var nativeTimeTaken = 0.0
+        var cppTimeTaken = 0.0
+        var neonTimeTaken = 0.0
+        val opTag = "sum"
+        val numTrial = 100
+
+        // neon improves performance by .58
+        for(no in 0 until numTrial){
+            val arrSize = Random.nextInt(10000, 100000)
+            val arr1 = FloatArray(arrSize){ Random.nextFloat() }
+
+            val startTimeNative = System.currentTimeMillis()
+            val rsltNative = Operations.sum(arr1.clone()) / arr1.size
+            val endTimeNative = System.currentTimeMillis()
+            nativeTimeTaken += endTimeNative - startTimeNative
+
+            val startTimeCPP = System.currentTimeMillis()
+            val rsltCPP = Operations.averageJNI(arr1.clone())
+            val endTimeCPP = System.currentTimeMillis()
+            cppTimeTaken += endTimeCPP - startTimeCPP
+
+            val startTimeNeon = System.currentTimeMillis()
+            val rsltNeon = Operations.averageNeon(arr1.clone())
+            val endTimeNeon = System.currentTimeMillis()
+            neonTimeTaken += endTimeNeon - startTimeNeon
+
+            println("-------------------------------------")
+            println("Neon time : $neonTimeTaken ms")
+            println("C++ time : $cppTimeTaken ms")
+            println("Native time : $nativeTimeTaken ms")
+            println("rsult arr size $arrSize : $rsltNeon $rsltCPP $rsltNative")
+
+            val result = TestHelper.compareResults(rsltNative, rsltCPP, rsltNeon)
+            assert(result)
+        }
     }
 }

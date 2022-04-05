@@ -31,6 +31,8 @@ object Operations {
         (pair.first * pair.second).toDouble()
     }
 
+    fun sum(arr1 : FloatArray) = arr1.sum()
+
     external fun cosineSimilarityCPP(arr1 : FloatArray, arr2 : FloatArray) : Float
 
     external fun cosineSimilarityNeon(arr1 : FloatArray, arr2 : FloatArray) : Float
@@ -42,6 +44,14 @@ object Operations {
     external fun softmaxJNI(arr1 : FloatArray) : FloatArray
 
     external fun softmaxNeon(arr1 : FloatArray) : FloatArray
+
+    external fun sumJNI(arr1 : FloatArray): Float
+
+    external fun sumNeon(arr1 : FloatArray) : Float
+
+    external fun averageJNI(arr1 : FloatArray): Float
+
+    external fun averageNeon(arr1 : FloatArray) : Float
 
     init{
         System.loadLibrary("neon_op")
