@@ -285,7 +285,6 @@ Java_com_jiwon_neon_1simd_Operations_sumNeon(JNIEnv *env, jobject thiz, jfloatAr
 
     int dim4 = len / 4;  //Array length divided by 4 integer
     int left4 = len - dim4 * 4;  //Array length divided by 4 remainder
-    LOGD("size : %d, dim4 : %d, remainder %d", len, dim4, left4);
     float32x4_t sum_vec =  vdupq_n_f32 ( 0.0 ) ; //Define the register used to temporarily store the accumulation result and initialize it Is 0
 
     short offset = 0;
@@ -329,7 +328,7 @@ Java_com_jiwon_neon_1simd_Operations_averageJNI(JNIEnv *env, jobject thiz, jfloa
         sum += jarr[i];
     }
 
-    env->ReleaseFloatArrayElements(arr1, jarr, 0);
+    //env->ReleaseFloatArrayElements(arr1, jarr, 0);
     return sum / len;
 }
 
@@ -338,9 +337,8 @@ JNIEXPORT jfloat JNICALL
 Java_com_jiwon_neon_1simd_Operations_averageNeon(JNIEnv *env, jobject thiz, jfloatArray arr1) {
     float* jarr = env->GetFloatArrayElements(arr1, 0);
     int len = env->GetArrayLength(arr1);
-
-    int dim4 = len / 4;  //Array length divided by 4 integer
-    int left4 = len - dim4 * 4 ;  //Array length divided by 4 remainder
+    int dim4 = len >> 2;  //Array length divided by 4 integer
+    int left4 = len & 3; // len - dim4 * 4 ;  //Array length divided by 4 remainder
     float32x4_t sum_vec =  vdupq_n_f32 ( 0.0 ) ; //Define the register used to temporarily store the accumulation result and initialize it Is 0
 
     short offset = 0;
@@ -356,6 +354,6 @@ Java_com_jiwon_neon_1simd_Operations_averageNeon(JNIEnv *env, jobject thiz, jflo
         sum += jarr[j + offset + 4];
     }
 
-    env->ReleaseFloatArrayElements(arr1, jarr, 0);
+    //env->ReleaseFloatArrayElements(arr1, jarr, 0);
     return sum / len;
 }

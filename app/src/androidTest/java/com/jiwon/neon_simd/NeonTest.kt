@@ -3,6 +3,7 @@ package com.jiwon.neon_simd
 import com.jiwon.neon_simd.helper.TestHelper
 import com.jiwon.neon_simd.helper.TestHelper.generateRandomFloatArray
 import org.junit.Test
+import java.text.DecimalFormat
 import kotlin.random.Random
 
 class NeonTest{
@@ -166,9 +167,8 @@ class NeonTest{
         val opTag = "sum"
         val numTrial = 100
 
-        val arrSize = Random.nextInt(300, 5000)
+        val arrSize = 1024 * 8
         val arr1 = FloatArray(arrSize){ it.toFloat() }
-        println("arr size $arrSize")
 
         val startTimeNative = System.currentTimeMillis()
         val rsltNative = Operations.sum(arr1.clone())
@@ -196,49 +196,45 @@ class NeonTest{
     }
 
     @Test
-    fun testAverageTime(){
+    fun testAverageOpTimeElapsed(){
         var nativeTimeTaken = 0.0
         var cppTimeTaken = 0.0
         var neonTimeTaken = 0.0
         val numTrial = 10000
+        val len = Random.nextInt(5000 - 100, 5000)
+        val arr1 = FloatArray(len){ it.toFloat() }
 
-        val len = Random.nextInt(4000, 10000)
+        println("native ${Operations.sum(arr1) / arr1.size}")
+        println("cpp ${Operations.averageJNI(arr1)}")
+        println("neon ${Operations.averageNeon(arr1)}")
 
         // neon improves performance by .58
-        for(no in 0 until numTrial){
-            val arr1 = FloatArray(len){ it.toFloat() }
+        for(no in 0 until NumTrial){
 
             val startTimeNative = System.currentTimeMillis()
-            val rsltNative = Operations.sum(arr1.clone()) / arr1.size
+            val rsltNative = Operations.sum(arr1) / arr1.size
             val endTimeNative = System.currentTimeMillis()
             nativeTimeTaken += endTimeNative - startTimeNative
 
             val startTimeCPP = System.currentTimeMillis()
-            val rsltCPP = Operations.averageJNI(arr1.clone())
+            val rsltCPP = Operations.averageJNI(arr1)
             val endTimeCPP = System.currentTimeMillis()
             cppTimeTaken += endTimeCPP - startTimeCPP
 
             val startTimeNeon = System.currentTimeMillis()
-            val rsltNeon = Operations.averageNeon(arr1.clone())
+            val rsltNeon = Operations.averageNeon(arr1)
             val endTimeNeon = System.currentTimeMillis()
             neonTimeTaken += endTimeNeon - startTimeNeon
-
-            val result = rsltNative == rsltCPP && rsltNative == rsltNeon
-            assert(result)
+            assert((rsltNative == rsltCPP) && (rsltNative == rsltNeon))
         }
 
-        try{
-            println("avg time taken neon($len): ${if(neonTimeTaken == 0.0) 0 else neonTimeTaken / numTrial}")
-            println("avg time taken cpp($len) : ${if(cppTimeTaken == 0.0) 0 else  cppTimeTaken / numTrial}")
-            println("avg time taken native($len) : ${if(nativeTimeTaken == 0.0) 0 else nativeTimeTaken / numTrial}")
-
-        }catch(e: Exception){
-            println(e.stackTraceToString())
-        }
+        println("avg time taken neon ($len)   : ${if(neonTimeTaken == 0.0) 0 else neonTimeTaken / numTrial}")
+        println("avg time taken cpp ($len)    : ${if(cppTimeTaken == 0.0) 0 else  cppTimeTaken / numTrial}")
+        println("avg time taken native ($len) : ${if(nativeTimeTaken == 0.0) 0 else nativeTimeTaken / numTrial}")
     }
 
     @Test
-    fun testAverage(){
+    fun testAverageOp(){
         var nativeTimeTaken = 0.0
         var cppTimeTaken = 0.0
         var neonTimeTaken = 0.0
